@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Register - Dollar Dreams</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .register-container {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      max-width: 400px;
+    }
+    
+    .register-container h1 {
+      text-align: center;
+      color: #6366f1;
+      margin-bottom: 2rem;
+      font-size: 1.8rem;
+    }
+    
+    .register-form .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .register-form button {
+      width: 100%;
+    }
+    
+    .register-links {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.9rem;
+    }
+    
+    .register-links a {
+      color: #6366f1;
+      text-decoration: none;
+    }
+    
+    .register-links a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="register-container">
+    <h1>Create Admin Account</h1>
+    
+    <form id="registerForm" class="register-form">
+      <div class="form-group">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" name="name" required placeholder="Your Name">
+      </div>
+      
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email" required placeholder="admin@example.com">
+      </div>
+      
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required placeholder="Create a strong password">
+      </div>
+      
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="Confirm password">
+      </div>
+      
+      <button type="submit" class="btn btn-primary btn-large">Register</button>
+    </form>
+    
+    <div id="errorMessage" class="error-message" style="display: none; margin-top: 1rem;">
+      <p id="errorText"></p>
+    </div>
+    
+    <div class="register-links">
+      <p>Already have an account? <a href="login.html">Login here</a></p>
+      <p><a href="../index.html">← Back to Home</a></p>
+    </div>
+  </div>
+  
+  <script src="../js/main.js"></script>
+  <script>
+    const registerForm = document.getElementById('registerForm');
+    const errorMessage = document.getElementById('errorMessage');
+    const errorText = document.getElementById('errorText');
+    
+    registerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      errorMessage.style.display = 'none';
+      
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      
+      if (!name || !email || !password || !confirmPassword) {
+        showRegisterError('Please fill in all fields');
+        return;
+      }
+      
+      if (password !== confirmPassword) {
+        showRegisterError('Passwords do not match');
+        return;
+      }
+      
+      if (password.length < 6) {
+        showRegisterError('Password must be at least 6 characters long');
+        return;
+      }
+      
+      try {
+        const response = await fetch(`${API_URL}/auth/register`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ name, email, password })
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.error || 'Registration failed');
+        }
+        
+        showNotification('Registration successful! Please login.');
+        setTimeout(() => {
+          window.location.href = 'login.html';
+        }, 1500);
+      } catch (error) {
+        showRegisterError(error.message);
+      }
+    });
+    
+    function showRegisterError(message) {
+      errorText.textContent = message;
+      errorMessage.style.display = 'block';
+      showNotification(message, 'error');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login - Dollar Dreams</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .login-container {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      max-width: 400px;
+    }
+    
+    .login-container h1 {
+      text-align: center;
+      color: #6366f1;
+      margin-bottom: 2rem;
+      font-size: 1.8rem;
+    }
+    
+    .login-form .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .login-form button {
+      width: 100%;
+    }
+    
+    .login-links {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.9rem;
+    }
+    
+    .login-links a {
+      color: #6366f1;
+      text-decoration: none;
+    }
+    
+    .login-links a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h1>💰 Admin Login</h1>
+    
+    <form id="loginForm" class="login-form">
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email" required placeholder="admin@example.com">
+      </div>
+      
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required placeholder="Enter your password">
+      </div>
+      
+      <button type="submit" class="btn btn-primary btn-large">Login</button>
+    </form>
+    
+    <div id="errorMessage" class="error-message" style="display: none; margin-top: 1rem;">
+      <p id="errorText"></p>
+    </div>
+    
+    <div class="login-links">
+      <p>Don't have an account? <a href="register.html">Register here</a></p>
+      <p><a href="../index.html">← Back to Home</a></p>
+    </div>
+  </div>
+  
+  <script src="../js/main.js"></script>
+  <script>
+    const loginForm = document.getElementById('loginForm');
+    const errorMessage = document.getElementById('errorMessage');
+    const errorText = document.getElementById('errorText');
+    
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      errorMessage.style.display = 'none';
+      
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      
+      if (!email || !password) {
+        showLoginError('Please fill in all fields');
+        return;
+      }
+      
+      try {
+        const response = await fetch(`${API_URL}/auth/login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email, password })
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.error || 'Login failed');
+        }
+        
+        // Store token and redirect
+        setAuthToken(data.token);
+        showNotification('Login successful!');
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 1000);
+      } catch (error) {
+        showLoginError(error.message);
+      }
+    });
+    
+    function showLoginError(message) {
+      errorText.textContent = message;
+      errorMessage.style.display = 'block';
+      showNotification(message, 'error');
+    }
+  </script>
+</body>
+</html>
