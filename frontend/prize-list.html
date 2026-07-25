@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prize List - Dollar Dreams Giveaway</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="container">
+      <div class="nav-brand">💰 Dollar Dreams</div>
+      <ul class="nav-menu">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="prize-list.html" class="active">Prizes</a></li>
+        <li><a href="entry.html">Enter Now</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="admin/login.html" class="btn-admin">Admin</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1>All Prize Categories</h1>
+    <p>Explore all the amazing rewards waiting for you</p>
+  </div>
+
+  <!-- Prizes Container -->
+  <section class="prizes-section">
+    <div class="container">
+      <div id="prizesList" class="prizes-container"></div>
+    </div>
+  </section>
+
+  <!-- Loading Message -->
+  <div id="loadingMessage" style="text-align: center; padding: 40px;">
+    <p>Loading prizes...</p>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h4>Dollar Dreams</h4>
+          <p>Your gateway to life-changing prizes</p>
+        </div>
+        <div class="footer-section">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="entry.html">Enter Now</a></li>
+          </ul>
+        </div>
+        <div class="footer-section">
+          <h4>Follow Us</h4>
+          <div class="social-links">
+            <a href="#">Facebook</a>
+            <a href="#">Twitter</a>
+            <a href="#">Instagram</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 Dollar Dreams Giveaway. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script>
+    // Fetch and display prizes
+    const API_URL = 'http://localhost:5000/api';
+    
+    async function loadPrizes() {
+      try {
+        const response = await fetch(`${API_URL}/prizes`);
+        const prizes = await response.json();
+        
+        document.getElementById('loadingMessage').style.display = 'none';
+        const prizesList = document.getElementById('prizesList');
+        
+        if (prizes.length === 0) {
+          prizesList.innerHTML = '<p>No prizes available yet.</p>';
+          return;
+        }
+        
+        prizesList.innerHTML = prizes.map(prize => `
+          <div class="prize-card-detail">
+            <div class="prize-image-wrapper">
+              ${prize.image ? `<img src="${prize.image}" alt="${prize.title}">` : '<div class="prize-placeholder">No Image</div>'}
+            </div>
+            <div class="prize-details">
+              <span class="prize-category">${prize.category}</span>
+              <h3>${prize.title}</h3>
+              <p>${prize.description}</p>
+              ${prize.value ? `<p class="prize-value">Value: $${prize.value.toLocaleString()}</p>` : ''}
+              ${prize.quantity ? `<p class="prize-quantity">Available: ${prize.quantity}</p>` : ''}
+            </div>
+          </div>
+        `).join('');
+      } catch (error) {
+        document.getElementById('loadingMessage').innerHTML = '<p>Error loading prizes. Please try again.</p>';
+        console.error('Error:', error);
+      }
+    }
+    
+    loadPrizes();
+  </script>
+</body>
+</html>
