@@ -5,26 +5,29 @@ const prizeSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  description: {
-    type: String,
-    required: true
-  },
   category: {
     type: String,
-    enum: ['Cash', 'Cars', 'Vacations', 'Dream Rewards'],
     required: true
   },
-  image: {
+  description: {
     type: String,
-    required: false
+    default: ''
   },
   value: {
     type: Number,
-    required: false
+    required: true
   },
   quantity: {
     type: Number,
     default: 1
+  },
+  image: {
+    type: String,
+    default: null
+  },
+  claimed: {
+    type: Number,
+    default: 0
   },
   active: {
     type: Boolean,

@@ -7,24 +7,41 @@ const entrySchema = new mongoose.Schema({
   },
   email: {
     type: String,
-    required: true,
-    lowercase: true
+    required: true
   },
   phone: {
     type: String,
     required: true
   },
+  selected: {
+    type: Boolean,
+    default: false
+  },
+  selectedDate: {
+    type: Date,
+    default: null
+  },
+  prize: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Prize',
+    default: null
+  },
+  status: {
+    type: String,
+    enum: ['pending', 'winner', 'contacted', 'claimed', 'declined'],
+    default: 'pending'
+  },
+  notes: {
+    type: String,
+    default: ''
+  },
   createdAt: {
     type: Date,
     default: Date.now
   },
-  ipAddress: {
-    type: String,
-    required: false
-  },
-  selected: {
-    type: Boolean,
-    default: false
+  updatedAt: {
+    type: Date,
+    default: Date.now
   }
 });
 

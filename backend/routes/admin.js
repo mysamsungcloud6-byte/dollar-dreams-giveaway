@@ -1,81 +1,107 @@
 const express = require('express');
-const router = express.Router();
 const Entry = require('../models/Entry');
 const Prize = require('../models/Prize');
-const auth = require('../middleware/auth');
+const authMiddleware = require('../middleware/auth');
+const { Parser } = require('json2csv');
 
-// Get analytics (admin only)
-router.get('/analytics', auth, async (req, res) => {
+const router = express.Router();
+
+// Get analytics
+router.get('/analytics', authMiddleware, async (req, res) => {
   try {
     const totalEntries = await Entry.countDocuments();
     const selectedEntries = await Entry.countDocuments({ selected: true });
-    const entriesByDay = await Entry.aggregate([
-      {
-        $group: {
-          _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
-          count: { $sum: 1 }
-        }
-      },
-      { $sort: { _id: 1 } }
-    ]);
-    
-    const prizeCounts = await Prize.aggregate([
-      {
-        $group: {
-          _id: '$category',
-          count: { $sum: 1 }
-        }
-      }
-    ]);
+    const prizeCounts = await Prize.find({ active: true });
     
     res.json({
       totalEntries,
       selectedEntries,
-      entriesByDay,
-      prizeCounts
+      prizeCounts: prizeCounts || []
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-// Select random winner (admin only)
-router.post('/select-winner', auth, async (req, res) => {
+// Select random winner
+router.post('/select-winner', authMiddleware, async (req, res) => {
   try {
-    const entries = await Entry.find({ selected: false });
+    // Find all entries that haven't been selected
+    const eligibleEntries = await Entry.find({ selected: false });
     
-    if (entries.length === 0) {
-      return res.status(400).json({ error: 'No eligible entries' });
+    if (eligibleEntries.length === 0) {
+      return res.status(400).json({ error: 'No eligible entries for selection' });
     }
     
-    const randomIndex = Math.floor(Math.random() * entries.length);
-    const winner = entries[randomIndex];
+    // Select random entry
+    const randomIndex = Math.floor(Math.random() * eligibleEntries.length);
+    const winner = eligibleEntries[randomIndex];
     
+    // Update winner status
     winner.selected = true;
+    winner.selectedDate = new Date();
+    winner.status = 'winner';
     await winner.save();
     
-    res.json({ message: 'Winner selected', winner });
+    res.json({
+      message: 'Winner selected successfully',
+      winner
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-// Export all entries (admin only)
-router.get('/export/entries', auth, async (req, res) => {
+// Export entries as CSV
+router.get('/export/entries', authMiddleware, async (req, res) => {
   try {
     const entries = await Entry.find().lean();
     
-    // Convert to CSV format
-    const headers = ['Name', 'Email', 'Phone', 'Submitted At', 'Selected'];
-    const csvData = entries.map(entry => 
-      `"${entry.name}","${entry.email}","${entry.phone}","${entry.createdAt.toISOString()}",${entry.selected}`
-    ).join('\n');
+    if (entries.length === 0) {
+      return res.status(400).json({ error: 'No entries to export' });
+    }
     
-    const csv = headers.join(',') + '\n' + csvData;
+    // Define CSV fields
+    const fields = ['name', 'email', 'phone', 'selected', 'status', 'createdAt'];
     
-    res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', 'attachment; filename=entries.csv');
-    res.send(csv);
+    try {
+      const parser = new Parser({ fields });
+      const csv = parser.parse(entries);
+      
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', 'attachment; filename="entries.csv"');
+      res.send(csv);
+    } catch (parseError) {
+      // Fallback: create CSV manually if json2csv fails
+      let csv = fields.join(',') + '\n';
+      entries.forEach(entry => {
+        csv += `"${entry.name}","${entry.email}","${entry.phone}",${entry.selected},"${entry.status}","${entry.createdAt}"\n`;
+      });
+      
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', 'attachment; filename="entries.csv"');
+      res.send(csv);
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get dashboard stats
+router.get('/stats', authMiddleware, async (req, res) => {
+  try {
+    const stats = {
+      totalEntries: await Entry.countDocuments(),
+      pendingEntries: await Entry.countDocuments({ status: 'pending' }),
+      winners: await Entry.countDocuments({ selected: true }),
+      totalPrizes: await Prize.countDocuments({ active: true }),
+      totalPrizeValue: 0
+    };
+    
+    const prizes = await Prize.find({ active: true });
+    stats.totalPrizeValue = prizes.reduce((sum, prize) => sum + (prize.value * prize.quantity), 0);
+    
+    res.json(stats);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
