@@ -1,33 +1,72 @@
 # Dollar Dreams Giveaway
 
-A promotional giveaway website showcasing prizes (cash, cars, vacations, and dream rewards) with a secure admin dashboard for full control.
+A modern, full-stack giveaway and raffle management platform built with Express.js, MongoDB, and vanilla JavaScript.
 
 ## 🎯 Features
 
-### Public Website
-- **Home Page**: Hero section with giveaway overview and featured prizes
-- **Prize List Page**: Showcase of all prize categories with images
-- **Entry Form**: User-friendly form to enter the giveaway
-- **About Page**: Mission statement and transparency information
-- **Contact Page**: Contact form and social media links
-- **Mobile Responsive Design**: Works seamlessly on all devices
-
-### Admin Dashboard
-- **Secure Login**: Email + password authentication
-- **Entry Management**: View all giveaway entries (name, email, phone, timestamp)
-- **Prize Management**: Add, edit, delete prizes with image uploads
-- **Content Management**: Edit homepage, prize descriptions, and images
-- **Winner Selection**: Random winner generator with export functionality
-- **Analytics**: Track entry count and basic traffic overview
+- **User Entry Management**: Simple form for users to enter the giveaway
+- **Admin Dashboard**: Complete admin panel for managing entries and prizes
+- **Prize Management**: Add, view, and manage prizes
+- **Random Winner Selection**: Fairly select winners from eligible entries
+- **Data Export**: Export all entries to CSV for record keeping
+- **Authentication**: Secure admin login and registration
+- **Responsive Design**: Works on desktop and mobile devices
+- **Beautiful UI**: Modern gradient design with smooth animations
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: HTML5, CSS3, JavaScript (ES6+)
-- **Backend**: Node.js + Express.js
-- **Database**: MongoDB
-- **Authentication**: JWT (JSON Web Tokens)
-- **Image Storage**: Multer (local) or cloud storage (AWS S3 optional)
-- **Environment**: Dotenv for configuration
+### Backend
+- **Node.js** & **Express.js** - Server framework
+- **MongoDB** - Database
+- **JWT** - Authentication
+- **bcryptjs** - Password hashing
+
+### Frontend
+- **HTML5** - Markup
+- **CSS3** - Styling with modern features
+- **Vanilla JavaScript** - No frameworks
+
+## 📋 Prerequisites
+
+- Node.js (v14 or higher)
+- MongoDB (local or cloud instance)
+- npm or yarn
+
+## 🚀 Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd dollar-dreams-giveaway
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Create .env file**
+   ```bash
+   cp .env.example .env
+   ```
+
+4. **Configure environment variables**
+   ```env
+   PORT=5000
+   MONGODB_URI=mongodb://localhost:27017/dollar-dreams
+   JWT_SECRET=your_secret_key_here
+   NODE_ENV=development
+   ```
+
+5. **Start the server**
+   ```bash
+   npm run dev
+   ```
+
+6. **Open your browser**
+   ```
+   http://localhost:5000
+   ```
 
 ## 📁 Project Structure
 
@@ -36,184 +75,103 @@ dollar-dreams-giveaway/
 ├── backend/
 │   ├── models/
 │   │   ├── User.js
-│   │   ├── Prize.js
-│   │   └── Entry.js
+│   │   ├── Entry.js
+│   │   └── Prize.js
 │   ├── routes/
 │   │   ├── auth.js
-│   │   ├── prizes.js
 │   │   ├── entries.js
+│   │   ├── prizes.js
 │   │   └── admin.js
 │   ├── middleware/
 │   │   └── auth.js
-│   ├── config/
-│   │   └── db.js
-│   ├── uploads/
-│   │   └── (prize images)
-│   ├── server.js
-│   ├── .env
-│   └── package.json
+│   └── server.js
 ├── frontend/
 │   ├── index.html
-│   ├── prize-list.html
 │   ├── entry.html
+│   ├── prize-list.html
 │   ├── about.html
 │   ├── contact.html
 │   ├── admin/
 │   │   ├── login.html
+│   │   ├── register.html
 │   │   ├── dashboard.html
-│   │   ├── manage-prizes.html
-│   │   └── admin.js
+│   │   └── js/
+│   │       └── admin.js
 │   ├── css/
-│   │   ├── style.css
-│   │   └── admin-style.css
-│   ├── js/
-│   │   ├── main.js
-│   │   ├── form-handler.js
-│   │   └── admin-auth.js
-│   └── images/
-│       ├── cash.jpg
-│       ├── cars.jpg
-│       ├── vacation.jpg
-│       └── dream-rewards.jpg
-└── .gitignore
+│   │   └── style.css
+│   └── js/
+│       ├── main.js
+│       └── form-handler.js
+└── package.json
 ```
 
-## 🚀 Quick Start
+## 🔐 Admin Features
 
-### Prerequisites
-- Node.js (v14+)
-- MongoDB (local or Atlas)
-- npm or yarn
-
-### Installation
-
-1. **Clone the repository**
-```bash
-git clone https://github.com/mysamsungcloud6-byte/dollar-dreams-giveaway.git
-cd dollar-dreams-giveaway
-```
-
-2. **Backend setup**
-```bash
-cd backend
-npm install
-```
-
-3. **Configure environment variables**
-```bash
-# Create .env file in backend/
-echo "MONGODB_URI=mongodb://localhost:27017/dollar-dreams" > .env
-echo "JWT_SECRET=your-secret-key-here" >> .env
-echo "PORT=5000" >> .env
-echo "ADMIN_EMAIL=admin@example.com" >> .env
-echo "ADMIN_PASSWORD=admin123" >> .env
-```
-
-4. **Start MongoDB**
-```bash
-# If using local MongoDB
-mongod
-```
-
-5. **Start the backend server**
-```bash
-npm start
-# Server runs on http://localhost:5000
-```
-
-6. **Open frontend**
-- Open `frontend/index.html` in your browser
-- Or serve with a local server:
-```bash
-cd ../frontend
-python -m http.server 8000
-# Open http://localhost:8000
-```
-
-## 🔐 Admin Access
-
-**Default Admin Credentials** (change immediately in production)
-- Email: `admin@example.com`
-- Password: `admin123`
-
-Access admin dashboard at: `http://localhost:8000/admin/login.html`
+- **Dashboard**: View key statistics
+- **Entries Management**: See all entries with filtering
+- **Prize Management**: Add and manage prizes
+- **Winner Selection**: Randomly select winners
+- **Data Export**: Export entries as CSV
 
 ## 📝 API Endpoints
 
 ### Authentication
-- `POST /api/auth/register` - Register new admin user
-- `POST /api/auth/login` - Admin login
-- `POST /api/auth/logout` - Admin logout
+- `POST /api/auth/register` - Register new admin
+- `POST /api/auth/login` - Login admin
+
+### Entries
+- `GET /api/entries` - Get all entries
+- `POST /api/entries` - Submit new entry
+- `PUT /api/entries/:id` - Update entry
+- `DELETE /api/entries/:id` - Delete entry
 
 ### Prizes
 - `GET /api/prizes` - Get all prizes
-- `POST /api/prizes` - Create new prize (admin only)
-- `PUT /api/prizes/:id` - Update prize (admin only)
-- `DELETE /api/prizes/:id` - Delete prize (admin only)
+- `POST /api/prizes` - Create prize
+- `PUT /api/prizes/:id` - Update prize
+- `DELETE /api/prizes/:id` - Delete prize
 
-### Entries
-- `POST /api/entries` - Submit giveaway entry
-- `GET /api/entries` - Get all entries (admin only)
-- `DELETE /api/entries/:id` - Delete entry (admin only)
-
-### Winner Selection
-- `POST /api/admin/select-winner` - Randomly select winner (admin only)
-- `GET /api/admin/analytics` - Get giveaway analytics (admin only)
+### Admin
+- `GET /api/admin/analytics` - Get analytics data
+- `POST /api/admin/select-winner` - Select random winner
+- `GET /api/admin/export/entries` - Export entries as CSV
 
 ## 🎨 Customization
 
-### Update Prize Categories
-Edit `backend/models/Prize.js` to modify prize types:
-```javascript
-// Modify the category enum
-category: {
-  type: String,
-  enum: ['Cash', 'Cars', 'Vacations', 'Dream Rewards', 'Your-Category'],
-  required: true
+### Colors
+Edit CSS variables in `frontend/css/style.css`:
+```css
+:root {
+  --primary-color: #6366f1;
+  --secondary-color: #ec4899;
+  --success-color: #10b981;
+  --danger-color: #ef4444;
 }
 ```
 
-### Customize Branding
-- Update logo in `frontend/index.html`
-- Modify colors in `frontend/css/style.css`
-- Edit copy in all HTML files
+### Content
+- Edit homepage content in `frontend/index.html`
+- Modify prize descriptions in `frontend/prize-list.html`
+- Update contact info in `frontend/contact.html`
 
-## 📦 Deployment
+## 🤝 Contributing
 
-### Deploy Backend to Heroku
-```bash
-cd backend
-heroku login
-heroku create dollar-dreams-giveaway
-git push heroku main
-```
-
-### Deploy Frontend to Vercel
-```bash
-cd frontend
-npm install -g vercel
-vercel
-```
-
-## 🔒 Security Considerations
-
-- Change default admin credentials immediately
-- Use strong JWT_SECRET in production
-- Enable HTTPS on production
-- Sanitize all user inputs
-- Use environment variables for sensitive data
-- Implement rate limiting on entry endpoint
-- Add CSRF protection
-- Validate file uploads
-
-## 📧 Support
-
-For questions or issues, contact: support@dollardreams.com
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📄 License
 
-MIT License - feel free to use this project as needed.
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 📞 Support
+
+For support, please open an issue on GitHub or contact us at support@dollardreams.com
+
+## 🙏 Acknowledgments
+
+- Thanks to all contributors
+- Inspired by modern giveaway platforms
+- Built with ❤️ for the community
 
 ---
 
-**Built with ❤️ for your giveaway success!**
+**Made with ❤️ by Dollar Dreams Team**
